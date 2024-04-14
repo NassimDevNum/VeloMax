@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue</title>
+</head>
+<body>
+    <h1>Bienvenue, <span id="username"></span>!</h1>
+    <form action="/deconnexion" method="get">
+        <button type="submit">Déconnexion</button>
+    </form>
+    <script>
+ 
+        // Extrait le nom d'utilisateur du cookie
+        function getCookie(name) {
+            let cookieArray = document.cookie.split(';');
+            for(let i = 0; i < cookieArray.length; i++) {
+                let cookiePair = cookieArray[i].split('=');
+                if(name == cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+        document.getElementById('username').textContent = getCookie('username');
+
+
+
+      //  document.getElementById('username').textContent = localStorage.getItem('username');
+    </script>
+</body>
+</html>

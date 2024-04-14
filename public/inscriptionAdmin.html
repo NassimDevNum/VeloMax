@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription Employé</title>
+</head>
+<body>
+    <h2>Inscription Employé</h2>
+    <form action="/inscriptionAdmin" method="post"> <!-- Modifiez ici pour correspondre à la route POST -->
+        <label for="nom">Nom :</label>
+        <input type="text" id="nom" name="nom" required><br><br>
+        
+        <label for="prenom">Prénom :</label>
+        <input type="text" id="prenom" name="prenom" required><br><br>
+        
+        <label for="Login_Employe">Login :</label>
+        <input type="text" id="Login_Employe" name="Login_Employe" required><br><br>
+
+        <label for="Mdp_Employe">Mot de passe :</label>
+        <input type="password" id="Mdp_Employe" name="password" required><br><br>
+        
+        <input type="submit" value="Inscrire">
+    </form>
+</body>
+</html>

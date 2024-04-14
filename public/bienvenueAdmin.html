@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Bienvenue, <span id="username">aaa</span>!</h1>
+    <table border="1" id="clientsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les données clients seront injectées ici -->
+        </tbody>
+    </table>
+    <form action="/deconnexion" method="get">
+        <button type="submit">Déconnexion</button>
+    </form>
+    <script>
+        // Extrait le nom d'utilisateur du cookie
+        function getCookie(name) {
+            let cookieArray = document.cookie.split(';');
+            for(let i = 0; i < cookieArray.length; i++) {
+                let cookiePair = cookieArray[i].split('=');
+                if(name == cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+        document.getElementById('username').textContent = getCookie('username');
+
+        // Fonction pour charger les données clients
+        function loadClients() {
+            $.ajax({
+                url: '/api/clients', // Assurez-vous que cette route est correctement définie dans votre serveur Express
+                method: 'GET',
+                success: function(clients) {
+                    var rows = '';
+                    clients.forEach(function(client) {
+                        rows += `<tr>
+                                    <td>${client.ID_Client}</td>
+                                    <td>${client.nom}</td>
+                                    <td>${client.prenom}</td>
+                                    <td>${client.email}</td>
+                                 </tr>`;
+                    });
+                    $('#clientsTable tbody').html(rows);
+                },
+                error: function(error) {
+                    console.log('Erreur lors de la récupération des clients:', error);
+                }
+            });
+        }
+
+        // Appeler loadClients au chargement de la page
+        $(document).ready(function() {
+            loadClients();
+        });
+    </script>
+</body>
+</html>
