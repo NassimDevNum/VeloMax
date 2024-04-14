@@ -189,8 +189,6 @@ app.post('/connexionAdmin', (req, res) => {
 
 
 // affiche les client 
-
-
 app.get('/api/clients', (req, res) => {
     if (!req.session.userId) {
         return res.status(401).send("Non autorisé");
@@ -206,6 +204,42 @@ app.get('/api/clients', (req, res) => {
     });
 });
 
+// supprimer un clien 
+app.delete('/api/clients/:id', (req, res) => {
+    const { id } = req.params;
+    if (!req.session.userId) {
+        return res.status(401).send("Accès refusé");
+    }
+
+    const query = "DELETE FROM Client WHERE ID_Client = ?";
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error("Erreur lors de la suppression du client: ", err);
+            return res.status(500).send("Erreur lors de la suppression du client.");
+        }
+        res.send("Client supprimé avec succès.");
+    });
+});
+
+//modifier le clien
+// Route pour modifier un client existant
+app.post('/api/clients/edit/:id', (req, res) => {
+    const { id } = req.params; // Récupère l'ID du client à modifier
+    const { nom, prenom, email } = req.body; // Récupère les nouvelles valeurs depuis le corps de la requête
+
+    if (!req.session.userId) {
+        return res.status(401).send("Action non autorisée."); // Sécurité pour s'assurer que l'utilisateur est connecté
+    }
+
+    const query = `UPDATE Client SET nom = ?, prenom = ?, email = ? WHERE ID_Client = ?`;
+    connection.query(query, [nom, prenom, email, id], (err, results) => {
+        if (err) {
+            console.error("Erreur lors de la mise à jour du client: ", err);
+            return res.status(500).send("Erreur lors de la modification du client.");
+        }
+        res.send("Client modifié avec succès !");
+    });
+});
 
 
 

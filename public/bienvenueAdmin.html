@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Bienvenue</title>
+    <style>
+        .action-button {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .delete-button {
+            color: red;
+        }
+        .edit-button {
+            color: green;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <h1>Bienvenue, <span id="username">aaa</span>!</h1>
+    <h1>Bienvenue, <span id="username"></span>!</h1>
     <table border="1" id="clientsTable">
         <thead>
             <tr>
@@ -14,6 +29,7 @@
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>Email</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +40,6 @@
         <button type="submit">Déconnexion</button>
     </form>
     <script>
-        // Extrait le nom d'utilisateur du cookie
         function getCookie(name) {
             let cookieArray = document.cookie.split(';');
             for(let i = 0; i < cookieArray.length; i++) {
@@ -37,21 +52,27 @@
         }
         document.getElementById('username').textContent = getCookie('username');
 
-        // Fonction pour charger les données clients
         function loadClients() {
             $.ajax({
-                url: '/api/clients', // Assurez-vous que cette route est correctement définie dans votre serveur Express
+                url: '/api/clients',
                 method: 'GET',
                 success: function(clients) {
                     var rows = '';
                     clients.forEach(function(client) {
-                        rows += `<tr>
-                                    <td>${client.ID_Client}</td>
-                                    <td>${client.nom}</td>
-                                    <td>${client.prenom}</td>
-                                    <td>${client.email}</td>
-                                 </tr>`;
-                    });
+    rows += `<tr data-id="${client.ID_Client}">
+                <td>${client.ID_Client}</td>
+                <td>${client.nom}</td>
+                <td>${client.prenom}</td>
+                <td>${client.email}</td>
+                <td>
+                    <span class="action-button edit-button" onclick="editClient(${client.ID_Client}, '${client.nom.replace(/'/g, "\\'")}', '${client.prenom.replace(/'/g, "\\'")}', '${client.email.replace(/'/g, "\\'")}')">✏️</span>
+                    <span class="action-button delete-button" onclick="deleteClient(${client.ID_Client})">×</span>
+                </td>
+             </tr>`;
+});
+
+
+
                     $('#clientsTable tbody').html(rows);
                 },
                 error: function(error) {
@@ -60,7 +81,68 @@
             });
         }
 
-        // Appeler loadClients au chargement de la page
+        function deleteClient(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
+                $.ajax({
+                    url: `/api/clients/${id}`,
+                    method: 'DELETE',
+                    success: function() {
+                        loadClients(); // Recharger la liste après suppression
+                    },
+                    error: function(error) {
+                        alert('Erreur lors de la suppression du client');
+                    }
+                });
+            }
+        }
+
+    function editClient(id, nom, prenom, email) {
+    var row = document.querySelector(`tr[data-id="${id}"]`);
+    var formHtml = `<td colspan="5">
+                        <form onsubmit="submitEdit(${id}, this); return false;">
+                            <input type="text" name="nom" value="${nom}">
+                            <input type="text" name="prenom" value="${prenom}">
+                            <input type="email" name="email" value="${email}">
+                            <button type="submit">Valider</button>
+                            <button type="button" onclick="cancelEdit(${id}, '${nom}', '${prenom}', '${email}')">Annuler</button>
+                        </form>
+                    </td>`;
+    row.innerHTML = formHtml;
+}
+        
+
+     
+function submitEdit(id, form) {
+    var data = $(form).serialize();
+    $.ajax({
+        url: `/api/clients/edit/${id}`,
+        method: 'POST',
+        data: data,
+        success: function() {
+            loadClients(); // Recharger la liste après modification
+        },
+        error: function(error) {
+            alert('Erreur lors de la modification du client');
+        }
+    });
+}
+
+
+
+function cancelEdit(id, nom, prenom, email) {
+    var row = document.querySelector(`tr[data-id="${id}"]`);
+    row.innerHTML = `
+        <td>${id}</td>
+        <td>${nom}</td>
+        <td>${prenom}</td>
+        <td>${email}</td>
+        <td>
+            <span class="action-button edit-button" onclick="editClient(${id}, '${nom}', '${prenom}', '${email}')">✏️</span>
+            <span class="action-button delete-button" onclick="deleteClient(${id})">×</span>
+        </td>
+    `;
+}
+
         $(document).ready(function() {
             loadClients();
         });
