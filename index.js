@@ -241,11 +241,6 @@ app.post('/api/clients/edit/:id', (req, res) => {
     });
 });
 
-
-
-
-
-
 // fin ici 
 app.listen(port, () => {
     console.log(`Serveur est en ligne sur le port ${port}!`);
