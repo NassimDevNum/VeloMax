@@ -24,6 +24,7 @@
     
     <h1>Bienvenue, <span id="username"></span>!</h1>
     <table border="1" id="clientsTable">
+        <h3>Vous avez <span id ="nbUser"> au total</span></h3>
         <thead>
             <tr>
                 <th>ID</th>
@@ -53,34 +54,64 @@
         }
         document.getElementById('username').textContent = getCookie('username');
 
-        function loadClients() {
-            $.ajax({
-                url: '/api/clients',
-                method: 'GET',
-                success: function(clients) {
-                    var rows = '';
-                    clients.forEach(function(client) {
-    rows += `<tr data-id="${client.ID_Client}">
-                <td>${client.ID_Client}</td>
-                <td>${client.nom}</td>
-                <td>${client.prenom}</td>
-                <td>${client.email}</td>
-                <td>
-                    <span class="action-button edit-button" onclick="editClient(${client.ID_Client}, '${client.nom.replace(/'/g, "\\'")}', '${client.prenom.replace(/'/g, "\\'")}', '${client.email.replace(/'/g, "\\'")}')">✏️</span>
-                    <span class="action-button delete-button" onclick="deleteClient(${client.ID_Client})">×</span>
-                </td>
-             </tr>`;
+
+        function updateClientCount() {
+    $.ajax({
+        url: '/api/clients/count',
+        method: 'GET',
+        success: function(count) {
+            $('#nbUser').text(count + " clients au total");  // Mise à jour du texte
+        },
+        error: function(error) {
+            console.log('Erreur lors de la récupération du nombre de clients:', error);
+        }
+    });
+}
+
+function updateClientCount() {
+    $.ajax({
+        url: '/api/clients/count',
+        method: 'GET',
+        success: function(count) {
+            $('#nbUser').text(count + " clients au total");  // Mise à jour du texte
+        },
+        error: function(error) {
+            console.log('Erreur lors de la récupération du nombre de clients:', error);
+        }
+    });
+}
+
+function loadClients() {
+    $.ajax({
+        url: '/api/clients',
+        method: 'GET',
+        success: function(clients) {
+            var rows = '';
+            clients.forEach(function(client) {
+                rows += `<tr data-id="${client.ID_Client}">
+                            <td>${client.ID_Client}</td>
+                            <td>${client.nom}</td>
+                            <td>${client.prenom}</td>
+                            <td>${client.email}</td>
+                            <td>
+                                <span class="action-button edit-button" onclick="editClient(${client.ID_Client}, '${client.nom.replace(/'/g, "\\'")}', '${client.prenom.replace(/'/g, "\\'")}', '${client.email.replace(/'/g, "\\'")}')">✏️</span>
+                                <span class="action-button delete-button" onclick="deleteClient(${client.ID_Client})">×</span>
+                            </td>
+                         </tr>`;
+            });
+            $('#clientsTable tbody').html(rows);
+            updateClientCount(); // Appel pour mettre à jour le nombre de clients
+        },
+        error: function(error) {
+            console.log('Erreur lors de la récupération des clients:', error);
+        }
+    });
+}
+
+$(document).ready(function() {
+    loadClients();
 });
 
-
-
-                    $('#clientsTable tbody').html(rows);
-                },
-                error: function(error) {
-                    console.log('Erreur lors de la récupération des clients:', error);
-                }
-            });
-        }
 
         function deleteClient(id) {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
@@ -143,6 +174,8 @@ function cancelEdit(id, nom, prenom, email) {
         </td>
     `;
 }
+
+
 
         $(document).ready(function() {
             loadClients();

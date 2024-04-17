@@ -155,7 +155,30 @@ app.post('/inscriptionAdmin', async (req, res) => {
 });
 
 
+
+// compte client
+
+app.get('/api/clients/count', (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).send("Non autorisé");
+    }
+
+    const query = "SELECT COUNT(*) AS count FROM Client;";
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error("Erreur lors de la récupération du nombre de clients: ", err);
+            return res.status(500).send("Erreur lors de la récupération des données.");
+        }
+        res.json(results[0].count);  // Assurez-vous que le résultat est correctement extrait
+    });
+});
+
+
 // Route de connexion employe 
+
+
+
+
 app.post('/connexionAdmin', (req, res) => {
     const { Login_Employe, password } = req.body;
     const query = `SELECT ID_Employe, nom, prenom, Mdp_Employe AS hashedPassword FROM Employe WHERE Login_Employe = ?`;
@@ -245,3 +268,5 @@ app.post('/api/clients/edit/:id', (req, res) => {
 app.listen(port, () => {
     console.log(`Serveur est en ligne sur le port ${port}!`);
 });
+
+
