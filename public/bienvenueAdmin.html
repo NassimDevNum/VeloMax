@@ -179,6 +179,117 @@ function cancelEdit(id, nom, prenom, email) {
         $(document).ready(function() {
             loadClients();
         });
+
+
+        function loadBikes() {
+    fetch('/api/bikes')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(bikes => {
+            console.log(bikes); // Vérifiez les données reçues
+            const container = document.getElementById('velos-container');
+            container.innerHTML = '';  // Clear the container first
+            bikes.forEach(bike => {
+                const bikeDiv = document.createElement('div');
+                bikeDiv.id = `bike-${bike.ID_Velo}`;
+                bikeDiv.className = 'velo';
+                bikeDiv.innerHTML = `
+                <style>
+                    .velo { margin-bottom: 20px; }
+                    img { width: 200px; height: auto; }
+                    .actions { margin-top: 10px; }
+                </style>  
+                <h2>${bike.Nom} (${bike.Grandeur})</h2>
+                <p>Prix: ${bike.Prix_Unitaire}€</p>
+                <img src="${bike.ImagePath}" alt="Image de ${bike.Nom}">
+                <button onclick='editBike(${bike.ID_Velo})'>Modifier</button>
+                <button onclick='deleteBike(${bike.ID_Velo})'>Supprimer</button>   `;
+                container.appendChild(bikeDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des vélos:', error);
+            container.innerHTML = '<p>Erreur lors du chargement des vélos.</p>';
+        });
+}
+
+
+function editBike(bikeId) {
+    const bikeDiv = document.getElementById(`bike-${bikeId}`);
+    if (!bikeDiv) {
+        console.error(`No bike div found for ID ${bikeId}`);
+        return; // Stop the function if no element is found
+    }
+
+    // Extrait les informations actuelles des vélos
+    const h2Element = bikeDiv.querySelector('h2');
+    const pElement = bikeDiv.querySelector('p');
+
+    if (!h2Element || !pElement) {
+        console.error('Required elements not found in bike div');
+        return;
+    }
+
+    const nom = h2Element.textContent.split(' (')[0];  // Assurez-vous que cela correspond à la structure du texte
+    const grandeur = h2Element.textContent.split('(')[1].slice(0, -1);
+    const prixText = pElement.textContent.replace(/[^0-9.]/g, '');
+    const prix = prixText ? parseFloat(prixText) : 0;  // Use 0 as default if parsing fails
+
+    if (isNaN(prix)) {
+        console.error('Invalid price extracted:', prixText);
+        return;
+    }
+
+    // Crée un formulaire pour éditer les informations
+    bikeDiv.innerHTML = `
+        <form onsubmit="submitEdit(event, ${bikeId})">
+            <input type="text" name="nom" value="${nom}">
+            <input type="text" name="grandeur" value="${grandeur}">
+            <input type="number" name="prix" value="${prix}" step="0.01">
+            <button type="submit">Sauvegarder</button>
+            <button type="button" onclick="cancelEdit(${bikeId})">Annuler</button>
+        </form>
+    `;
+}
+
+function submitEdit(event, bikeId) {
+    event.preventDefault();
+    const form = event.target;
+    const data = {
+        nom: form.nom.value,
+        grandeur: form.grandeur.value,
+        prix: parseFloat(form.prix.value)
+    };
+
+    fetch(`/api/bikes/${bikeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to update bike');
+        loadBikes(); // Recharge les données des vélos
+    })
+    .catch(error => {
+        console.error('Error updating bike:', error);
+        alert('Failed to update bike');
+    });
+}
+
+function cancelEdit(bikeId) {
+    loadBikes();  // Recharge simplement les vélos pour annuler l'édition
+}
+
+
+
+function cancelEdit(bikeId) {
+    loadBikes(); // Simply reload the bikes to cancel editing
+// Recharge simplement les vélos pour annuler l'édition
+}
     </script>
 </body>
 </html>
