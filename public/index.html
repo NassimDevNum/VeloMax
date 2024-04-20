@@ -7,8 +7,19 @@
     <meta charset="UTF-8">
     <title>Bienvenue chez VeloMax</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        a { display: inline-block; margin: 10px; }
+        .action-button {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .delete-button {
+            color: red;
+        }
+        .edit-button {
+            color: green;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 
 </head>
@@ -16,9 +27,12 @@
 <body>
 
     <header></header>
-
    
     
+    <div id="velos-container">
+        <!-- Les vélos seront chargés ici -->
+    </div>
+
     <footer></footer>
 
     <script src="js/script1.js"></script>

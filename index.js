@@ -245,6 +245,7 @@ app.delete('/api/clients/:id', (req, res) => {
 });
 
 //modifier le clien
+
 // Route pour modifier un client existant
 app.post('/api/clients/edit/:id', (req, res) => {
     const { id } = req.params; // Récupère l'ID du client à modifier
@@ -263,6 +264,53 @@ app.post('/api/clients/edit/:id', (req, res) => {
         res.send("Client modifié avec succès !");
     });
 });
+// Route pour récupérer tous les vélos
+app.get('/api/bikes', (req, res) => {
+    const query = "SELECT * FROM Velo";
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error("Erreur lors de la récupération des vélos: ", err);
+            return res.status(500).send("Erreur lors de la récupération des données.");
+        }
+        res.json(results);
+    });
+});
+
+
+
+
+
+//modifier un vélo 
+
+// Route pour modifier un vélo// Supprimer un vélo
+app.delete('/api/bikes/:id', (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM Velo WHERE ID_Velo = ?";
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error("Erreur lors de la suppression du vélo: ", err);
+            return res.status(500).send("Erreur lors de la suppression du vélo.");
+        }
+        res.send("Vélo supprimé avec succès !");
+    });
+});
+
+//modifier un vélo 
+app.put('/api/bikes/:id', (req, res) => {
+    const { id } = req.params;
+    const { nom, grandeur, prix } = req.body;
+    const query = "UPDATE Velo SET Nom = ?, Grandeur = ?, Prix_Unitaire = ? WHERE ID_Velo = ?";
+    connection.query(query, [nom, grandeur, prix, id], (err, result) => {
+        if (err) {
+            console.error("Erreur lors de la mise à jour du vélo: ", err);
+            return res.status(500).send("Erreur lors de la mise à jour du vélo.");
+        }
+        res.send("Vélo modifié avec succès !");
+    });
+});
+
+
+
 
 // fin ici 
 app.listen(port, () => {

@@ -38,6 +38,17 @@
             <!-- Les données clients seront injectées ici -->
         </tbody>
     </table>
+
+        
+    <div id="velos-container">
+        <!-- Les vélos seront chargés ici -->
+    </div>
+
+    <footer></footer>
+
+    <script src="js/scriptAdmin.js"></script>
+    
+
     <form action="/deconnexion" method="get">
         <button type="submit">Déconnexion</button>
     </form>
@@ -68,18 +79,6 @@
     });
 }
 
-function updateClientCount() {
-    $.ajax({
-        url: '/api/clients/count',
-        method: 'GET',
-        success: function(count) {
-            $('#nbUser').text(count + " clients au total");  // Mise à jour du texte
-        },
-        error: function(error) {
-            console.log('Erreur lors de la récupération du nombre de clients:', error);
-        }
-    });
-}
 
 function loadClients() {
     $.ajax({
@@ -183,5 +182,3 @@ function cancelEdit(id, nom, prenom, email) {
     </script>
 </body>
 </html>
-
-public\img\vttNoir.jpg
